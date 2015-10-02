@@ -41,32 +41,6 @@
     LinphoneProxyConfig *cfg=NULL;
     linphone_core_get_default_proxy(lc,&cfg);
     
-    if (cfg) {
-        const char *identity=linphone_proxy_config_get_identity(cfg);
-        LinphoneAddress *addr=linphone_address_new(identity);
-        
-        // Get SIP Transport
-        LinphoneTransportType transport = linphone_address_get_transport(addr);
-        
-        if(transport == LinphoneTransportUdp){
-            linphone_address_set_transport(addr, LinphoneTransportTcp);
-            transport = linphone_address_get_transport(addr);
-        }
-        
-        NSString *sip_transport = @"";
-        switch (transport) {
-            case LinphoneTransportTcp:
-                sip_transport = @"Unencrypted (TCP)";
-                break;
-            case LinphoneTransportTls:
-                sip_transport = @"Encrypted (TLS)";
-                break;
-                
-            default:
-                break;
-        }
-    }
-    
     accountModel = [[AccountsService sharedInstance] getDefaultAccount];
     
     if(accountModel.username != NULL) { self.textFieldUsername.stringValue = accountModel.username; }
@@ -76,10 +50,6 @@
     if(accountModel.transport != NULL) { [self.comboBoxTransport selectItemWithObjectValue:accountModel.transport]; }
     NSInteger auto_answer = [[NSUserDefaults standardUserDefaults] boolForKey:@"ACE_AUTO_ANSWER_CALL"];
     self.buttonAutoAnswer.state = auto_answer;
-    
-}
-
-- (IBAction)onButtonAutoAnswer:(id)sender {
 }
 
 - (void) save {

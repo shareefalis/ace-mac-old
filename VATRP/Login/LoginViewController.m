@@ -18,6 +18,7 @@
 
 @property (weak) IBOutlet NSTextField *textFieldUsername;
 @property (weak) IBOutlet NSTextField *textFieldPassword;
+@property (weak) IBOutlet NSProgressIndicator *progressIndicatorRegister;
 
 @end
 
@@ -44,7 +45,7 @@
                                              selector:@selector(registrationUpdateEvent:)
                                                  name:kLinphoneRegistrationUpdate
                                                object:nil];
-
+    
     [[LinphoneManager instance]	startLinphoneCore];
     [[LinphoneManager instance] lpConfigSetBool:FALSE forKey:@"enable_first_login_view_preference"];
 
@@ -109,13 +110,13 @@
 }
 
 - (IBAction)onButtonLogin:(id)sender {
+    self.progressIndicatorRegister.hidden = NO;
+    [self.progressIndicatorRegister startAnimation:nil];
+    
     [self verificationSignInWithUsername:self.textFieldUsername.stringValue
                                 password:self.textFieldPassword.stringValue
                                   domain:@"bc1.vatrp.net"
                            withTransport:@"TCP"];
-
-    [[AppDelegate sharedInstance] showTabWindow];
-    [[AppDelegate sharedInstance].loginWindowController close];
 }
 
 - (void)startUp {
@@ -123,6 +124,7 @@
     @try {
         core = [LinphoneManager getLc];
         LinphoneManager* lm = [LinphoneManager instance];
+        LinphoneGlobalState linphoneGlobalState = linphone_core_get_global_state(core);
         if( linphone_core_get_global_state(core) != LinphoneGlobalOn ){
             //            [self changeCurrentView: [DialerViewController compositeViewDescription]];
         } else if ([[LinphoneManager instance] lpConfigBoolForKey:@"enable_first_login_view_preference"]  == true) {
@@ -337,7 +339,7 @@
                                                     , NULL
                                                     ,linphone_proxy_config_get_domain(proxyCfg));
     
-    [self setDefaultSettings:proxyCfg];
+//    [self setDefaultSettings:proxyCfg];
     
     [self clearProxyConfig];
     
@@ -369,6 +371,17 @@
         case LinphoneRegistrationOk: {
 //            [[AppDelegate sharedInstance] showTabWindow];
 //            [[AppDelegate sharedInstance].loginWindowController close];
+
+
+            [self.progressIndicatorRegister stopAnimation:nil];
+
+            [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                            name:kLinphoneConfiguringStateUpdate
+                                                          object:nil];
+            [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                            name:kLinphoneRegistrationUpdate
+                                                          object:nil];
+
             
             [[AccountsService sharedInstance] addAccountWithUsername:self.textFieldUsername.stringValue
                                                             Password:self.textFieldPassword.stringValue

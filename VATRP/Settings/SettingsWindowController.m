@@ -8,6 +8,7 @@
 
 #import "SettingsWindowController.h"
 #import "SettingsViewController.h"
+
 #import "AccountsViewController.h"
 #import "CodecsViewController.h"
 #import "MediaViewController.h"
@@ -17,7 +18,6 @@
     AccountsViewController *accountsViewController;
     CodecsViewController *codecsViewController;
     MediaViewController *mediaViewController;
-    
     NSView *prevView;
 }
 
@@ -44,6 +44,7 @@
     
     SettingsViewController *settingsViewController = (SettingsViewController*)self.contentViewController;
     settingsViewController.delegate = self;
+    self.window.contentView = accountsViewController.view;
 }
 
 - (void)myWindowWillClose:(NSNotification *)notification
@@ -73,11 +74,13 @@
 
 - (void) didClickSettingsViewControllerSeve:(SettingsViewController*)settingsViewController {
     [accountsViewController save];
-    [codecsViewController save];
-    [mediaViewController save];
+ //   [codecsViewController save];
+//    [mediaViewController save];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
     [self close];
 }
+
+
 
 @end
